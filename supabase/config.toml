@@ -1,0 +1,5 @@
+# Supabase local config (опционально для supabase CLI)
+# project_id = "your-project-ref"
+
+[functions.analyze-food]
+verify_jwt = true

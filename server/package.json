@@ -1,0 +1,19 @@
+{
+  "name": "kachai-ai-proxy",
+  "version": "1.0.0",
+  "description": "Backend-прокси KachAI: скрывает ключи AI-провайдеров (Claude/Grok/OpenAI)",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

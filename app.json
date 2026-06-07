@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "kachai",
+    "slug": "kachai",
+    "scheme": "kachai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0B0B0B"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "KachAI нужна камера, чтобы сфотографировать тарелку и посчитать Ккал и БЖУ.",
+        "NSPhotoLibraryUsageDescription": "KachAI нужен доступ к галерее, чтобы выбрать фото еды для анализа."
+      }
+    },
+    "android": {
+      "permissions": ["CAMERA", "READ_MEDIA_IMAGES", "READ_EXTERNAL_STORAGE"],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": false,
+          "data": [{ "scheme": "kachai" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Разреши KachAI доступ к камере для анализа тарелки."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Разреши KachAI доступ к галерее для выбора фото еды."
+        }
+      ]
+    ],
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

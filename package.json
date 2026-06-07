@@ -1,0 +1,56 @@
+{
+  "name": "kachai",
+  "version": "1.0.0",
+  "main": "expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "start:clear": "expo start -c",
+    "start:lan": "expo start --lan -c",
+    "start:tunnel": "expo start --tunnel -c",
+    "start:localhost": "expo start --localhost -c",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "verify": "node scripts/verify-metro.js",
+    "test:claude": "node scripts/test-claude.js"
+  },
+  "engines": {
+    "node": ">=20.19.4"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-navigation/bottom-tabs": "^6.6.1",
+    "@react-navigation/native": "^6.1.18",
+    "@react-navigation/native-stack": "^6.11.0",
+    "@supabase/supabase-js": "^2.45.4",
+    "expo": "~54.0.35",
+    "expo-auth-session": "~7.0.11",
+    "expo-camera": "~17.0.10",
+    "expo-crypto": "~15.0.9",
+    "expo-file-system": "~19.0.23",
+    "expo-image-picker": "~17.0.11",
+    "expo-linking": "~8.0.12",
+    "expo-web-browser": "~15.0.11",
+    "expo-status-bar": "~3.0.9",
+    "nativewind": "4.1.23",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-css-interop": "0.1.22",
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-url-polyfill": "^2.0.0",
+    "react-native-worklets": "0.5.1"
+  },
+  "devDependencies": {
+    "@expo/ngrok": "4.1.3",
+    "@babel/core": "^7.26.0",
+    "@types/react": "~19.1.10",
+    "babel-preset-expo": "~54.0.10",
+    "tailwindcss": "^3.4.10",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}

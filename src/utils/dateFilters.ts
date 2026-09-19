@@ -1,5 +1,4 @@
-import { MealHistoryFilter } from "../types/mealLog";
-import { SavedMealEntry } from "../types/mealLog";
+import type { MealHistoryFilter, SavedMealEntry } from "../types/mealLog";
 
 export function startOfDay(date: Date): Date {
   const d = new Date(date);

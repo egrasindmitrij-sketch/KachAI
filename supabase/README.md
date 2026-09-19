@@ -13,13 +13,12 @@ Claude API ключ хранится **только** в секретах Edge F
    ```
 3. **Удали** `EXPO_PUBLIC_CLAUDE_API_KEY` из `.env` приложения — ключ больше не нужен на клиенте.
 
-## 2. Примени SQL (таблицы + RLS)
+## 2. Примени SQL (таблицы + RLS + фото)
 
-Supabase Dashboard → **SQL Editor** → вставь содержимое файла:
+Supabase Dashboard → **SQL Editor** → выполни **оба** файла по порядку:
 
-`supabase/migrations/20250606000000_initial_schema.sql`
-
-Нажми **Run**.
+1. `supabase/migrations/20250606000000_initial_schema.sql`
+2. `supabase/migrations/20260919000000_users_insert_and_meal_photos.sql`
 
 Создастся:
 - `public.users` — профиль (расширение `auth.users`)
@@ -28,6 +27,10 @@ Supabase Dashboard → **SQL Editor** → вставь содержимое фа
 - `public.analysis_logs` — логи AI-запросов
 - RLS: пользователь видит только свои данные
 - Триггер: при регистрации создаётся профиль + trial 3 дня
+- Policy `users_insert_own` — клиент может создать профиль, если триггер не сработал
+- Storage bucket `meal-photos` (private) — фото приёмов пищи
+
+Клиент с JWT-сессией **читает и пишет** `users` / `subscriptions` / `meals`. Без сессии (demo) всё остаётся в AsyncStorage.
 
 ## 3. Установи Supabase CLI
 
@@ -105,3 +108,5 @@ supabase/.env.local
 | `Неверная сессия` | Перелогинься, проверь `EXPO_PUBLIC_SUPABASE_*` |
 | 404 на function | `supabase functions deploy analyze-food` |
 | RLS error на meals | Убедись, что SQL миграция применена |
+| Фото не открывается в истории | Примени `20260919000000_users_insert_and_meal_photos.sql` (bucket `meal-photos`) |
+| Дневник пустой после входа | Записи demo-режима локальные и не переносятся в облако автоматически |

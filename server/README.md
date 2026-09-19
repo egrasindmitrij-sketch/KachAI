@@ -26,8 +26,12 @@ EXPO_PUBLIC_AI_PROXY_URL=http://192.168.1.41:8787
 # EXPO_PUBLIC_AI_PROXY_TOKEN=...
 ```
 
-Когда `EXPO_PUBLIC_AI_PROXY_URL` задан, приложению **ключ Claude не нужен** —
-запрос идёт на прокси, а ключ берётся из `server/.env`.
+Когда `EXPO_PUBLIC_AI_PROXY_URL` задан **и Supabase не настроен**, приложению
+ключ Claude не нужен — запрос идёт на прокси, ключ берётся из `server/.env`.
+
+Если заданы и Supabase, и proxy: клиент сначала вызывает Edge Function
+`analyze-food`, а при ошибке (функция не задеплоена, нет сети к Supabase)
+повторяет запрос через этот proxy.
 
 ## Эндпоинты
 

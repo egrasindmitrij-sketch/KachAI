@@ -14,6 +14,7 @@ export type SavedMealEntry = {
   };
   foods: MealAnalysis["foods"];
   source: AnalysisSource;
+  confidence?: number;
 };
 
 export type MealHistoryFilter = "today" | "week" | "all";

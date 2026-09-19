@@ -7,6 +7,7 @@ import {
   useMemo,
   useState
 } from "react";
+import { useAuth } from "./AuthContext";
 import {
   activateMonthlyPlan,
   activateYearlyPlan,
@@ -32,6 +33,7 @@ type SubscriptionContextValue = {
 const SubscriptionContext = createContext<SubscriptionContextValue | undefined>(undefined);
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
+  const { user, hasSupabaseSession } = useAuth();
   const [state, setState] = useState<SubscriptionState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
@@ -50,7 +52,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     refresh();
-  }, [refresh]);
+  }, [refresh, user?.id, hasSupabaseSession]);
 
   useEffect(() => {
     const timer = setInterval(() => setNowTick(Date.now()), 1000);

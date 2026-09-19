@@ -2,14 +2,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GymButton } from "../components/ui/GymButton";
 import { useAuth } from "../context/AuthContext";
 import { useSubscription } from "../context/SubscriptionContext";
+import { useUi } from "../context/UiContext";
 import { RootStackParamList } from "../navigation/types";
 import { getAccessUntil, getStatusLabel } from "../services/subscriptionStorage";
-import { getProfileStats, getUserProfile } from "../services/storage";
+import { getProfileStats, getUserProfile, saveUserProfile } from "../services/storage";
 import { ProfileStats } from "../types/profile";
 import { formatCountdown } from "../utils/formatCountdown";
 
@@ -28,8 +29,12 @@ export function ProfileScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { state, hasAccess, timeLeftMs } = useSubscription();
   const { user, signOut } = useAuth();
+  const { showToast } = useUi();
   const [isLoading, setIsLoading] = useState(true);
   const [displayName, setDisplayName] = useState("Бро Качок");
+  const [draftName, setDraftName] = useState("Бро Качок");
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isSavingName, setIsSavingName] = useState(false);
   const [stats, setStats] = useState<ProfileStats>({
     totalMeals: 0,
     avgKcal: 0,
@@ -49,6 +54,7 @@ export function ProfileScreen() {
     try {
       const [profile, profileStats] = await Promise.all([getUserProfile(), getProfileStats()]);
       setDisplayName(profile.displayName);
+      setDraftName(profile.displayName);
       setStats(profileStats);
     } finally {
       setIsLoading(false);
@@ -71,7 +77,58 @@ export function ProfileScreen() {
           <View className="h-24 w-24 items-center justify-center rounded-full border-[3px] border-gym-red bg-black">
             <Ionicons name="barbell" size={42} color="#D00000" />
           </View>
-          <Text className="mt-4 text-2xl font-extrabold text-white">{displayName}</Text>
+          {isEditingName ? (
+            <View className="mt-4 w-full">
+              <TextInput
+                value={draftName}
+                onChangeText={setDraftName}
+                placeholder="Имя в зале"
+                placeholderTextColor="#5A5A5A"
+                className="rounded-xl border border-zinc-700 bg-black px-4 py-3 text-center text-xl font-extrabold text-white"
+              />
+              <View className="mt-3 flex-row gap-2">
+                <Pressable
+                  className="h-11 flex-1 items-center justify-center rounded-xl border border-zinc-700 bg-gym-card"
+                  onPress={() => {
+                    setDraftName(displayName);
+                    setIsEditingName(false);
+                  }}
+                >
+                  <Text className="text-xs font-extrabold uppercase text-white">Отмена</Text>
+                </Pressable>
+                <Pressable
+                  className="h-11 flex-1 items-center justify-center rounded-xl bg-gym-red"
+                  disabled={isSavingName}
+                  onPress={async () => {
+                    const next = draftName.trim() || "Бро Качок";
+                    setIsSavingName(true);
+                    try {
+                      await saveUserProfile({ displayName: next });
+                      setDisplayName(next);
+                      setDraftName(next);
+                      setIsEditingName(false);
+                      showToast("Имя сохранено", "success");
+                    } catch {
+                      showToast("Не удалось сохранить имя", "error");
+                    } finally {
+                      setIsSavingName(false);
+                    }
+                  }}
+                >
+                  <Text className="text-xs font-extrabold uppercase text-white">
+                    {isSavingName ? "..." : "Сохранить"}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          ) : (
+            <Pressable className="mt-4 items-center" onPress={() => setIsEditingName(true)}>
+              <Text className="text-2xl font-extrabold text-white">{displayName}</Text>
+              <Text className="mt-1 text-xs font-bold uppercase tracking-widest text-gym-red">
+                Изменить имя
+              </Text>
+            </Pressable>
+          )}
           <Text className="mt-1 text-sm font-semibold text-gym-muted">
             {user?.email ?? "KachAI · Iron Fuel"}
           </Text>

@@ -12,7 +12,7 @@ import { useSubscription } from "../context/SubscriptionContext";
 import { MainTabParamList, RootStackParamList } from "../navigation/types";
 import { getStatusLabel } from "../services/subscriptionStorage";
 import { formatCountdown } from "../utils/formatCountdown";
-import { getTodayMeals, getTodayTotals } from "../services/storage";
+import { getTodayMeals, getTodayTotals, getUserProfile } from "../services/storage";
 import { DailyTotals, SavedMealEntry } from "../types/mealLog";
 import { formatMealTime } from "../utils/dateFilters";
 import { getMotivationMessage } from "../utils/motivation";
@@ -30,13 +30,19 @@ export function HomeScreen() {
     mealsCount: 0
   });
   const [recentMeals, setRecentMeals] = useState<SavedMealEntry[]>([]);
+  const [greetingName, setGreetingName] = useState("Бро");
 
   const loadDashboard = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [todayTotals, todayMeals] = await Promise.all([getTodayTotals(), getTodayMeals(5)]);
+      const [todayTotals, todayMeals, profile] = await Promise.all([
+        getTodayTotals(),
+        getTodayMeals(5),
+        getUserProfile()
+      ]);
       setTotals(todayTotals);
       setRecentMeals(todayMeals);
+      setGreetingName(profile.displayName.trim().split(/\s+/)[0] || "Бро");
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +69,7 @@ export function HomeScreen() {
       <ScrollView className="flex-1" contentContainerClassName="px-6 pb-8 pt-2">
         <View className="mb-4">
           <Text className="text-xs font-extrabold uppercase tracking-widest text-gym-muted">Сегодня</Text>
-          <Text className="mt-1 text-3xl font-extrabold text-white">Привет, Бро</Text>
+          <Text className="mt-1 text-3xl font-extrabold text-white">Привет, {greetingName}</Text>
           <Text className="mt-1 text-sm font-semibold text-gym-muted">
             Цель: набор массы · {caloriesGoal} ккал · {totals.mealsCount} приём(ов)
           </Text>
@@ -172,17 +178,18 @@ export function HomeScreen() {
             </View>
           ) : (
             <View className="gap-3">
-              {recentMeals.map((meal) => (
-                <View
+              {              recentMeals.map((meal) => (
+                <Pressable
                   key={meal.id}
-                  className="flex-row items-center justify-between rounded-xl border border-zinc-800 bg-gym-card px-4 py-4"
+                  onPress={() => rootNavigation.navigate("MealDetail", { mealId: meal.id })}
+                  className="flex-row items-center justify-between rounded-xl border border-zinc-800 bg-gym-card px-4 py-4 active:opacity-85"
                 >
                   <View className="flex-1 pr-3">
                     <Text className="font-extrabold text-white">{meal.title}</Text>
                     <Text className="mt-1 text-xs font-bold text-gym-muted">{formatMealTime(meal.createdAt)}</Text>
                   </View>
                   <Text className="text-lg font-extrabold text-gym-red">{meal.kcalTotal}</Text>
-                </View>
+                </Pressable>
               ))}
             </View>
           )}

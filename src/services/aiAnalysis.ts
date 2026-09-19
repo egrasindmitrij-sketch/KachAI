@@ -548,7 +548,15 @@ export async function analyzeWithClaude(
   mediaType: string = "image/jpeg"
 ): Promise<ProviderCallResult> {
   if (isSupabaseConfigured) {
-    return analyzeWithClaudeEdgeFunction(base64, mediaType);
+    try {
+      return await analyzeWithClaudeEdgeFunction(base64, mediaType);
+    } catch (error) {
+      if (AI_CONFIG.useProxy) {
+        logError("Edge Function недоступна, пробуем legacy proxy", error);
+        return analyzeWithClaudeProxy(base64, mediaType);
+      }
+      throw error;
+    }
   }
   if (AI_CONFIG.useProxy) {
     return analyzeWithClaudeProxy(base64, mediaType);

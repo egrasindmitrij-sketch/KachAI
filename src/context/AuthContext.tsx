@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Linking from "expo-linking";
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import { applySessionFromAuthUrl, isAuthCallbackUrl } from "../services/authSession";
+import { ensureCloudUser } from "../services/cloud/ensureUser";
 import { signInWithGoogleOAuth } from "../services/oauth";
 import { getSupabaseClient, isSupabaseConfigured } from "../services/supabase";
 
@@ -34,6 +35,14 @@ function isDemoUserId(id: string): boolean {
 
 function userFromSession(user: { id: string; email?: string | null }): AuthUser {
   return { id: user.id, email: user.email ?? null };
+}
+
+async function bootstrapCloudUser(user: AuthUser): Promise<void> {
+  try {
+    await ensureCloudUser(user);
+  } catch (error) {
+    if (__DEV__) console.warn("[KachAI] ensureCloudUser", error);
+  }
 }
 
 /** Перевод частых ошибок Supabase на русский. */
@@ -79,8 +88,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data } = await supabase.auth.getSession();
         if (mounted) {
           if (data.session?.user) {
-            setUser(userFromSession(data.session.user));
+            const nextUser = userFromSession(data.session.user);
+            setUser(nextUser);
             setHasSupabaseSession(true);
+            void bootstrapCloudUser(nextUser);
           } else {
             setUser(null);
             setHasSupabaseSession(false);
@@ -90,8 +101,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
           if (session?.user) {
-            setUser(userFromSession(session.user));
+            const nextUser = userFromSession(session.user);
+            setUser(nextUser);
             setHasSupabaseSession(true);
+            void bootstrapCloudUser(nextUser);
           } else {
             setUser(null);
             setHasSupabaseSession(false);
@@ -131,8 +144,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Подтверждение email / OAuth — deep link из браузера обратно в приложение
   useEffect(() => {
-    const supabase = getSupabaseClient();
-    if (!supabase) return;
+    const client = getSupabaseClient();
+    if (!client) return;
+    const supabase = client;
 
     async function handleIncomingUrl(url: string) {
       if (!isAuthCallbackUrl(url)) return;
@@ -145,8 +159,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
-        setUser(userFromSession(data.session.user));
+        const nextUser = userFromSession(data.session.user);
+        setUser(nextUser);
         setHasSupabaseSession(true);
+        void bootstrapCloudUser(nextUser);
         if (__DEV__) console.log("[KachAI] Сессия из deep link", data.session.user.email);
       }
     }
@@ -187,8 +203,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           };
         }
 
-        setUser(userFromSession(sessionData.session.user));
+        const nextUser = userFromSession(sessionData.session.user);
+        setUser(nextUser);
         setHasSupabaseSession(true);
+        void bootstrapCloudUser(nextUser);
         return { ok: true };
       }
 
@@ -215,8 +233,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         if (data.session?.user) {
-          setUser(userFromSession(data.session.user));
+          const nextUser = userFromSession(data.session.user);
+          setUser(nextUser);
           setHasSupabaseSession(true);
+          void bootstrapCloudUser(nextUser);
           return { ok: true };
         }
 
@@ -226,8 +246,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           password
         });
         if (!signInError && signInData.session?.user) {
-          setUser(userFromSession(signInData.session.user));
+          const nextUser = userFromSession(signInData.session.user);
+          setUser(nextUser);
           setHasSupabaseSession(true);
+          void bootstrapCloudUser(nextUser);
           return { ok: true };
         }
 
@@ -262,8 +284,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { ok: false, error: "Сессия не создана после Google-входа" };
       }
 
-      setUser(userFromSession(sessionData.session.user));
+      const nextUser = userFromSession(sessionData.session.user);
+      setUser(nextUser);
       setHasSupabaseSession(true);
+      void bootstrapCloudUser(nextUser);
       return { ok: true };
     }
 

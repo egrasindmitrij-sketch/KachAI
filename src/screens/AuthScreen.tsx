@@ -128,13 +128,13 @@ export function AuthScreen({ navigation }: Props) {
           {!isConfigured ? (
             <View className="mt-5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3">
               <Text className="text-xs font-bold leading-5 text-amber-400">
-                Demo-режим: вход без сервера. Для AI-анализа настрой Supabase в .env
+                Demo-режим: вход без сервера. Для реального AI запусти server/ (EXPO_PUBLIC_AI_PROXY_URL) или настрой Supabase.
               </Text>
             </View>
           ) : (
             <View className="mt-5 rounded-xl border border-zinc-700 bg-gym-card px-4 py-3">
               <Text className="text-xs font-bold leading-5 text-gym-muted">
-                Вход через email — сразу после регистрации. Для AI-анализа нужен аккаунт Supabase.
+                Вход через email — сразу после регистрации. Дневник и подписка синхронизируются в Supabase.
               </Text>
             </View>
           )}

@@ -119,7 +119,8 @@ export function ResultScreen({ navigation, route }: Props) {
       await saveMealEntry({
         photoUri,
         analysis,
-        source: analysisMeta.source
+        source: analysisMeta.source,
+        confidence: analysisMeta.confidence
       });
       setSaveSuccess(true);
       showToast("Сохранено в дневник", "success");

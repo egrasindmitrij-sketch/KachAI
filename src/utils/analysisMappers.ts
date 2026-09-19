@@ -1,5 +1,5 @@
-import { MealAnalysis } from "../navigation/types";
-import { AnalysisResult } from "../types/analysis";
+import type { MealAnalysis } from "../navigation/types";
+import type { AnalysisResult } from "../types/analysis";
 
 export function toMealAnalysis(result: AnalysisResult): MealAnalysis {
   const proteinG = Math.round(result.protein);

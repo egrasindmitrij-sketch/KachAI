@@ -78,8 +78,13 @@ export function hasConfiguredApiKey(provider: AiProvider = AI_CONFIG.provider): 
 }
 
 export function getMissingKeyMessage(provider: AiProvider = AI_CONFIG.provider): string {
-  if (provider === "claude" && !isSupabaseConfigured) {
-    return "Настрой Supabase (EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY) и задеплой Edge Function analyze-food";
+  if (provider === "claude") {
+    if (!isSupabaseConfigured && !AI_CONFIG.useProxy) {
+      return "Для Claude настрой Supabase Edge Function (EXPO_PUBLIC_SUPABASE_*) или локальный proxy (EXPO_PUBLIC_AI_PROXY_URL)";
+    }
+    if (isSupabaseConfigured) {
+      return "Настрой Supabase и задеплой Edge Function analyze-food (см. supabase/README.md)";
+    }
   }
   return `API ключ не настроен. Добавь ${PROVIDER_KEY_HINT[provider]} в .env`;
 }
@@ -97,6 +102,7 @@ export function getAiSetupSummary(): Record<string, string | boolean> {
     model: AI_CONFIG.claudeModel,
     useEdgeFunction: isSupabaseConfigured,
     useProxy: AI_CONFIG.useProxy,
+    proxyFallback: isSupabaseConfigured && AI_CONFIG.useProxy,
     proxyUrl: AI_CONFIG.proxyUrl || "(нет)",
     claudeReady: hasConfiguredApiKey("claude")
   };
